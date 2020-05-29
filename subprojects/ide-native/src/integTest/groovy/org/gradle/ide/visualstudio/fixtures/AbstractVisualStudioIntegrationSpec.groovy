@@ -44,9 +44,7 @@ abstract class AbstractVisualStudioIntegrationSpec extends AbstractInstalledTool
         // We direct the output because msbuild jumbles up stdout/stderr in ways that mess up our output scraping.
         // There is probably another way we could redirect the output or scrape the output, but this is good enough for testing.
         // In real builds (we do not redirect output normally), msbuild and VS do not hang like this.
-        executer.requireGradleDistribution().
-            requireIsolatedDaemons().
-            requireDaemon()
+        executer.requireIsolatedDaemons().requireDaemon()
 
         initScript << IdeCommandLineUtil.generateGradleProbeInitFile('visualStudio', 'msbuild')
         initScript << """
@@ -65,7 +63,7 @@ abstract class AbstractVisualStudioIntegrationSpec extends AbstractInstalledTool
                     }
                 }
             }
-    
+
             def redirectOutputForAll(nodes, relativeToRoot) {
                 nodes.each { node ->
                     redirectOutput node.NMakeBuildCommandLine[0], relativeToRoot

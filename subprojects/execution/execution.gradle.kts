@@ -53,4 +53,6 @@ dependencies {
     testFixturesImplementation(project(":buildCache"))
     testFixturesImplementation(project(":snapshots"))
     testFixturesImplementation(project(":modelCore"))
+
+    integTestDistributionRuntimeOnly(project(":distributionsCore"))
 }

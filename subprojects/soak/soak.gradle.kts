@@ -23,7 +23,6 @@ plugins {
 dependencies {
     testFixturesImplementation(project(":baseServices"))
     testFixturesImplementation(project(":core"))
-    testFixturesImplementation(project(":internalTesting"))
     testFixturesImplementation(project(":internalIntegTesting"))
 
     testImplementation(project(":kotlinDslTestFixtures"))
@@ -36,7 +35,7 @@ dependencies {
     integTestImplementation(library("slf4j_api"))
     integTestImplementation(testLibrary("jetty"))
 
-    integTestRuntimeOnly(project(":runtimeApiInfo"))
+    integTestDistributionRuntimeOnly(project(":distributionsCore"))
 }
 
 tasks.integTest {

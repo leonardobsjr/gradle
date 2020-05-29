@@ -67,6 +67,8 @@ dependencies {
     implementation(testFixtures(project(":toolingApi")))
 
     runtimeOnly("mysql:mysql-connector-java:8.0.17")
+
+    integTestDistributionRuntimeOnly(project(":distributionsCore"))
 }
 
 val generatedResourcesDir = gradlebuildJava.generatedResourcesDir

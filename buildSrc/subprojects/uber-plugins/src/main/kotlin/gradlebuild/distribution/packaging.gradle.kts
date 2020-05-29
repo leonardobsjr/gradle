@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package gradlebuild.distribution
 
-package org.gradle.gradlebuild.docs;
-
-import org.gradle.api.file.RegularFileProperty;
-
-/**
- * Configuration for release features.
- */
-public abstract class ReleaseFeatures {
-    /**
-     * Source of release features/highlights
-     */
-    public abstract RegularFileProperty getReleaseFeaturesFile();
+plugins {
+    `java-base`
+    id("gradlebuild.repositories")
+    id("gradlebuild.minify")
+    id("gradlebuild.reproducible-archives")
+    id("gradlebuild.distributions")
 }

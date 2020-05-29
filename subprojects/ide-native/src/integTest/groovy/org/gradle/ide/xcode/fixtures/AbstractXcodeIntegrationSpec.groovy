@@ -106,7 +106,7 @@ rootProject.name = "${rootProjectName}"
     }
 
     void useXcodebuildTool() {
-        executer.requireGradleDistribution().requireIsolatedDaemons()
+        executer.requireDaemon().requireIsolatedDaemons()
 
         def initScript = file("init.gradle")
         initScript << IdeCommandLineUtil.generateGradleProbeInitFile('xcode', 'xcodebuild')

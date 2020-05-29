@@ -25,8 +25,10 @@ import org.gradle.integtests.fixtures.executer.GradleContextualExecuter
 import org.gradle.test.fixtures.file.LeaksFileHandles
 import org.gradle.util.TextUtil
 import org.junit.Rule
+import spock.lang.IgnoreIf
 
 @LeaksFileHandles
+@IgnoreIf({ GradleContextualExecuter.embedded }) // These test run independent applications that connect to a Gradle distribution through the Tooling API
 class SamplesToolingApiIntegrationTest extends AbstractIntegrationSpec {
 
     @Rule public final Sample sample = new Sample(temporaryFolder)
@@ -136,7 +138,6 @@ repositories {
     private ExecutionResult run(String task = 'run', File dir = sample.dir) {
         try {
             result = new GradleContextualExecuter(distribution, temporaryFolder, getBuildContext())
-                    .requireGradleDistribution()
                     .inDirectory(dir)
                     .withTasks(task)
                     .run()

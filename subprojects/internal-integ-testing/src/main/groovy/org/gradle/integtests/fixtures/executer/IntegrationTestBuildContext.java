@@ -16,7 +16,6 @@
 
 package org.gradle.integtests.fixtures.executer;
 
-import com.google.common.base.CaseFormat;
 import org.gradle.test.fixtures.file.TestFile;
 import org.gradle.util.GradleVersion;
 
@@ -31,16 +30,18 @@ public class IntegrationTestBuildContext {
     public static final TestFile TEST_DIR = new TestFile(new File(".").toURI());
     public static final IntegrationTestBuildContext INSTANCE = new IntegrationTestBuildContext();
 
+    @Nullable
     public TestFile getGradleHomeDir() {
-        return file("integTest.gradleHomeDir", null);
+        return nullableFile("integTest.gradleHomeDir", null);
     }
 
     public TestFile getSamplesDir() {
         return file("integTest.samplesdir", null);
     }
 
-    public TestFile getDistributionsDir() {
-        return file("integTest.distsDir", "build/distributions");
+    @Nullable
+    public TestFile getBinDistribution() {
+        return nullableFile("integTest.binDistribution", null);
     }
 
     public TestFile getLibsRepo() {
@@ -52,12 +53,7 @@ public class IntegrationTestBuildContext {
     }
 
     public TestFile getGradleUserHomeDir() {
-        return file("integTest.gradleUserHomeDir", "intTestHomeDir").file("worker-1");
-    }
-
-    @Nullable
-    public TestFile getGradleGeneratedApiJarCacheDir() {
-        return optionalFile("integTest.gradleGeneratedApiJarCacheDir");
+        return file("integTest.gradleUserHomeDir", "intTestHomeDir/distributions-unknown");
     }
 
     public TestFile getTmpDir() {
@@ -70,20 +66,6 @@ public class IntegrationTestBuildContext {
 
     public GradleVersion getVersion() {
         return GradleVersion.current();
-    }
-
-    public String getCurrentSubprojectName() {
-        return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, getGradleHomeDir().getParentFile().getParentFile().getName());
-    }
-
-    /**
-     * The timestamped version used in the docs and the bin and all zips. This should be different to {@link GradleVersion#getVersion()}.
-     * Note that the binary distribution used for testing (binZip and intTestImage) has {@link GradleVersion#getVersion()} as version.
-     *
-     * @return timestamped version
-     */
-    public GradleVersion getDistZipVersion() {
-        return GradleVersion.version(System.getProperty("integTest.distZipVersion", GradleVersion.current().getVersion()));
     }
 
     public GradleDistribution distribution(String version) {
@@ -108,6 +90,18 @@ public class IntegrationTestBuildContext {
         }
         if (defaultPath == null) {
             throw new RuntimeException("You must set the '" + propertyName + "' property to run the integration tests.");
+        }
+        return testFile(defaultPath);
+    }
+
+    @Nullable
+    protected static TestFile nullableFile(String propertyName, String defaultPath) {
+        TestFile testFile = optionalFile(propertyName);
+        if (testFile != null) {
+            return testFile;
+        }
+        if (defaultPath == null) {
+            return null;
         }
         return testFile(defaultPath);
     }

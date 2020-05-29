@@ -88,7 +88,6 @@ task check {
         """
 
                 GradleExecuter executer = distribution.executer(workspace, IntegrationTestBuildContext.INSTANCE).
-                        requireGradleDistribution().
                         withGradleUserHomeDir(workspace.file("user-home"))
                 8.times {
                     executer.inDirectory(buildDir).withArgument("--refresh-dependencies").withTasks('check').run()

@@ -2,8 +2,13 @@ package org.gradle.gradlebuild.test.integrationtests
 
 import accessors.groovy
 import accessors.java
+import library
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.LibraryElements
+import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.ClasspathNormalizer
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SourceSet
@@ -14,25 +19,31 @@ import org.gradle.api.tasks.testing.junitplatform.JUnitPlatformOptions
 import org.gradle.gradlebuild.versioning.buildVersion
 import org.gradle.kotlin.dsl.*
 import org.gradle.plugins.ide.idea.IdeaPlugin
-import org.gradle.gradlebuild.versioning.buildVersion
 import java.util.concurrent.Callable
 
 
-enum class TestType(val prefix: String, val executers: List<String>, val libRepoRequired: Boolean) {
-    INTEGRATION("integ", listOf("embedded", "forking", "noDaemon", "parallel", "instant", "vfsRetention"), false),
-    CROSSVERSION("crossVersion", listOf("embedded", "forking"), true)
+enum class TestType(val prefix: String, val executers: List<String>) {
+    INTEGRATION("integ", listOf("embedded", "forking", "noDaemon", "parallel", "instant", "vfsRetention")),
+    CROSSVERSION("crossVersion", listOf("embedded", "forking"))
 }
 
 
-internal
-fun Project.addDependenciesAndConfigurations(testType: TestType) {
-    val prefix = testType.prefix
+fun Project.addDependenciesAndConfigurations(prefix: String) {
     configurations {
         getByName("${prefix}TestImplementation") { extendsFrom(configurations["testImplementation"]) }
-        getByName("${prefix}TestRuntimeOnly") { extendsFrom(configurations["testRuntimeOnly"]) }
+
+        val distributionRuntimeOnly = bucket("${prefix}TestDistributionRuntimeOnly")
+        val binDistribution = bucket("${prefix}TestBinDistribution")
+        val libsRepository = bucket("${prefix}TestLibsRepository")
+
+        getByName("${prefix}TestRuntimeClasspath") { extendsFrom(distributionRuntimeOnly) }
+        resolver("${prefix}TestDistributionRuntimeClasspath", "gradle-distribution-jars", distributionRuntimeOnly)
+        resolver("${prefix}TestBinDistributionPath", "gradle-distribution-zip", binDistribution)
+        resolver("${prefix}TestLibsRepositoryPath", "gradle-libs-repository", libsRepository)
     }
 
     dependencies {
+        "${prefix}TestRuntimeOnly"(library("junit5_vintage"))
         "${prefix}TestImplementation"(project(":internalIntegTesting"))
     }
 }
@@ -87,7 +98,6 @@ fun Project.createTestTask(name: String, executer: String, sourceSet: SourceSet,
         addDebugProperties()
         testClassesDirs = sourceSet.output.classesDirs
         classpath = sourceSet.runtimeClasspath
-        libsRepository.required = testType.libRepoRequired
         extraConfig.execute(this)
     }
 
@@ -205,4 +215,26 @@ fun Test.excludeCategories(vararg categories: String) {
     } else {
         (options as JUnitPlatformOptions).excludeTags(*categories)
     }
+}
+
+
+private
+fun Project.bucket(name: String) = configurations.create(name) {
+    isVisible = false
+    isCanBeResolved = false
+    isCanBeConsumed = false
+}
+
+
+private
+fun Project.resolver(name: String, libraryElements: String, extends: Configuration) = configurations.create(name) {
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(libraryElements))
+    }
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    isVisible = false
+    extendsFrom(extends)
 }
