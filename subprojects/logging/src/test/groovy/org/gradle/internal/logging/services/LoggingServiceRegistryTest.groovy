@@ -36,8 +36,10 @@ import java.util.logging.Logger
 
 class LoggingServiceRegistryTest extends Specification {
     final TestOutputEventListener outputEventListener = new TestOutputEventListener()
-    @Rule ConfigureLogging logging = new ConfigureLogging(outputEventListener)
-    @Rule RedirectStdOutAndErr outputs = new RedirectStdOutAndErr()
+    @Rule
+    ConfigureLogging logging = new ConfigureLogging(outputEventListener)
+    @Rule
+    RedirectStdOutAndErr outputs = new RedirectStdOutAndErr()
 
     def providesALoggingManagerFactory() {
         given:
@@ -55,15 +57,6 @@ class LoggingServiceRegistryTest extends Specification {
         expect:
         def factory = registry.get(StyledTextOutputFactory.class)
         factory instanceof DefaultStyledTextOutputFactory
-    }
-
-    def providesACommandLineConverter() {
-        given:
-        def registry = LoggingServiceRegistry.newCommandLineProcessLogging()
-
-        expect:
-        def converter = registry.get(CommandLineConverter.class)
-        converter instanceof LoggingCommandLineConverter
     }
 
     def resetsSlf4jWhenStarted() {
