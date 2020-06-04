@@ -98,7 +98,7 @@ public interface ProviderOperationParameters {
      * @return When null, use the provider's default value for color output.
      * @since 2.3-rc-1
      */
-    boolean isColorOutput();
+    Boolean isColorOutput();
 
     /**
      * @return When null, discard the stdout (rather than forward to the current process' stdout)
