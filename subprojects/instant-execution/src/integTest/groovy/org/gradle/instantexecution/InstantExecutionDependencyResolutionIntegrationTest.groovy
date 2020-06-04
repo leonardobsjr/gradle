@@ -16,7 +16,7 @@
 
 package org.gradle.instantexecution
 
-import org.gradle.integtests.fixtures.instantexecution.InstantExecutionBuildOperationsFixture
+
 import org.gradle.integtests.resolve.transform.ArtifactTransformTestFixture
 import spock.lang.Ignore
 import spock.lang.Issue
@@ -790,17 +790,65 @@ class InstantExecutionDependencyResolutionIntegrationTest extends AbstractInstan
         instantFails(":resolve")
 
         then:
-        fixture.assertStateStoreFailed()
+        // TODO - this should fail
+        fixture.assertStateStored()
+        // TODO - should not attempt to run the task
+        failure.assertHasFailure("Execution failed for task ':resolve'.") {
+            it.assertHasCause("Failed to transform root.blue to match attributes {artifactType=blue, color=green}.")
+            it.assertHasCause("Failed to transform a.blue to match attributes {artifactType=blue, color=green}.")
+        }
+        failure.assertHasDescription("Configuration cache problems found in this build.")
+        // TODO - there should be 1 failure
+        failure.assertHasFailures(2)
 
         when:
         instantFails(":resolve")
 
         then:
-        fixture.assertStateStoreFailed()
+        fixture.assertStateLoaded()
+        failure.assertHasDescription("Execution failed for task ':resolve'.")
     }
 
     def "reports failure transforming project dependency"() {
-        expect: false
+        settingsFile << """
+            include 'a'
+        """
+        setupBuildWithColorTransformAction()
+        buildFile << """
+            abstract class MakeGreen implements TransformAction<TransformParameters.None> {
+                @InputArtifact
+                abstract Provider<FileSystemLocation> getInputArtifact()
+
+                void transform(TransformOutputs outputs) {
+                    def input = inputArtifact.get().asFile
+                    println "processing \${input.name}"
+                    throw new RuntimeException("broken: \${input.name}")
+                }
+            }
+
+            dependencies {
+                implementation project(':a')
+            }
+        """
+
+        def fixture = newInstantExecutionFixture()
+
+        when:
+        instantFails(":resolve")
+
+        then:
+        // TODO - this should fail
+        fixture.assertStateStored()
+        failure.assertHasFailure("Execution failed for task ':resolve'.") {
+            it.assertHasCause("Failed to transform a.jar (project :a) to match attributes {artifactType=jar, color=green}.")
+        }
+
+        when:
+        instantFails(":resolve")
+
+        then:
+        fixture.assertStateLoaded()
+        failure.assertHasDescription("Execution failed for task ':resolve'.")
     }
 
     @Ignore("wip")
