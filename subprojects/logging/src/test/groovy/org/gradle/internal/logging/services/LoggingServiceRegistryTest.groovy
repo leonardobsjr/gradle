@@ -18,10 +18,8 @@ package org.gradle.internal.logging.services
 
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.StandardOutputListener
-import org.gradle.cli.CommandLineConverter
 import org.gradle.internal.SystemProperties
 import org.gradle.internal.logging.ConfigureLogging
-import org.gradle.internal.logging.LoggingCommandLineConverter
 import org.gradle.internal.logging.LoggingManagerInternal
 import org.gradle.internal.logging.TestOutputEventListener
 import org.gradle.internal.logging.text.StyledTextOutputFactory
