@@ -202,12 +202,12 @@ fun applyDefaultDependencies(model: CIBuildModel, buildType: BuildType, notQuick
     if (notQuick) {
         // wait for quick feedback phase to finish successfully
         buildType.dependencies {
-            dependency(stageTriggerId(model, StageNames.QUICK_FEEDBACK_LINUX_ONLY)) {
-                snapshot {
-                    onDependencyFailure = FailureAction.CANCEL
-                    onDependencyCancel = FailureAction.CANCEL
-                }
-            }
+//            dependency(stageTriggerId(model, StageNames.QUICK_FEEDBACK_LINUX_ONLY)) {
+//                snapshot {
+//                    onDependencyFailure = FailureAction.CANCEL
+//                    onDependencyCancel = FailureAction.CANCEL
+//                }
+//            }
         }
     }
 

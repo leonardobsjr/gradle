@@ -89,11 +89,11 @@ class StagePasses(model: CIBuildModel, stage: Stage, prevStage: Stage?, stagePro
 
     dependencies {
         if (!stage.runsIndependent && prevStage != null) {
-            dependency(stageTriggerId(model, prevStage)) {
-                snapshot {
-                    onDependencyFailure = FailureAction.ADD_PROBLEM
-                }
-            }
+//            dependency(stageTriggerId(model, prevStage)) {
+//                snapshot {
+//                    onDependencyFailure = FailureAction.ADD_PROBLEM
+//                }
+//            }
         }
 
         snapshotDependencies(stageProject.specificBuildTypes)
@@ -109,9 +109,9 @@ fun stageTriggerId(model: CIBuildModel, stage: Stage) = stageTriggerId(model, st
 fun stageTriggerId(model: CIBuildModel, stageName: StageName) = AbsoluteId("${model.projectPrefix}Stage_${stageName.id}_Trigger")
 
 fun Dependencies.snapshotDependencies(buildTypes: Iterable<BuildType>) {
-    buildTypes.forEach {
-        dependency(it.id!!) {
-            snapshot {}
-        }
-    }
+//    buildTypes.forEach {
+//        dependency(it.id!!) {
+//            snapshot {}
+//        }
+//    }
 }
