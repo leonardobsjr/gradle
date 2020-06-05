@@ -443,5 +443,11 @@ suspend fun ReadContext.readOutputPropertiesOf(task: Task) =
 
 
 private
-fun ReadContext.createTask(projectPath: String, taskName: String, taskClass: Class<out Task>) =
-    getProject(projectPath).tasks.createWithoutConstructor(taskName, taskClass) as TaskInternal
+fun ReadContext.createTask(projectPath: String, taskName: String, taskClass: Class<out Task>): TaskInternal {
+    val project = try {
+        getProject(projectPath)
+    } catch (e: Exception) {
+        throw Exception("Missing project '$projectPath' for task named '$taskName' of type '${taskClass.simpleName}'", e)
+    }
+    return project.tasks.createWithoutConstructor(taskName, taskClass) as TaskInternal
+}
