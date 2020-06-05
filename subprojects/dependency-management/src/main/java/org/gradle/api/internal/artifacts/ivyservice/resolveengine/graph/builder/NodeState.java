@@ -615,7 +615,7 @@ public class NodeState implements DependencyGraphNode {
 
     public void evict() {
         evicted = true;
-        restartIncomingEdges();
+        restartIncomingEdges(false);
     }
 
     boolean shouldIncludedInGraphResult() {
@@ -976,18 +976,18 @@ public class NodeState implements DependencyGraphNode {
             }
         } else {
             if (!incomingEdges.isEmpty()) {
-                restartIncomingEdges();
+                restartIncomingEdges(true);
             }
         }
     }
 
-    private void restartIncomingEdges() {
+    private void restartIncomingEdges(boolean unattach) {
         if (incomingEdges.size() == 1) {
             EdgeState singleEdge = incomingEdges.get(0);
-            singleEdge.restart();
+            singleEdge.restart(unattach);
         } else {
             for (EdgeState dependency : new ArrayList<>(incomingEdges)) {
-                dependency.restart();
+                dependency.restart(unattach);
             }
         }
         clearIncomingEdges();

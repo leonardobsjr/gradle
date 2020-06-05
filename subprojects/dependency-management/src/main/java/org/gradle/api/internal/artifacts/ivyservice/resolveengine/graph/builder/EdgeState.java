@@ -181,9 +181,13 @@ class EdgeState implements DependencyGraphEdge {
         targetNodeSelectionFailure = new ModuleVersionResolveException(dependencyState.getRequested(), err);
     }
 
-    public void restart() {
+    public void restart(boolean unattach) {
         if (from.isSelected()) {
             removeFromTargetConfigurations();
+            // We now have corner cases that can lead to this restart not succeeding
+            if (unattach && !selector.getTargetModule().getUnattachedDependencies().contains(this)) {
+                selector.getTargetModule().addUnattachedDependency(this);
+            }
             attachToTargetConfigurations();
         }
     }
