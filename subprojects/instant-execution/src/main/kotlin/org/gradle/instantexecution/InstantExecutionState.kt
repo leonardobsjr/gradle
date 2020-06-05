@@ -20,6 +20,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.GradleInternal
 import org.gradle.api.invocation.Gradle
+import org.gradle.api.logging.Logging
 import org.gradle.api.provider.Provider
 import org.gradle.caching.configuration.BuildCache
 import org.gradle.execution.plan.Node
@@ -189,7 +190,12 @@ class InstantExecutionState(
 
     private
     fun Encoder.writeRelevantProjectsFor(nodes: List<Node>) {
-        writeCollection(fillTheGapsOf(relevantProjectPathsFor(nodes))) { project ->
+        val projects = fillTheGapsOf(relevantProjectPathsFor(nodes))
+        if (projects.isNotEmpty()) {
+            Logging.getLogger(InstantExecutionState::class.java)
+                .lifecycle("Captured Projects\n  ${projects.joinToString("\n  ") { it.path }}\n")
+        }
+        writeCollection(projects) { project ->
             writeString(project.path)
             writeFile(project.projectDir)
         }
