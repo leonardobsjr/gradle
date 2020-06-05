@@ -29,6 +29,7 @@ import org.gradle.tooling.internal.protocol.exceptions.InternalUnsupportedBuildA
 import org.gradle.tooling.internal.provider.connection.ProviderOperationParameters;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class ProviderStartParameterConverter {
@@ -65,26 +66,24 @@ class ProviderStartParameterConverter {
         }
 
         List<String> arguments = parameters.getArguments();
-        if (arguments != null) {
-            StartParameterConverter converter = new StartParameterConverter();
-            CommandLineParser parser = new CommandLineParser();
-            new BuildLayoutConverter().configure(parser);
-            converter.configure(parser);
-            ParsedCommandLine parsedCommandLine;
-            try {
-                parsedCommandLine = parser.parse(arguments);
-            } catch (CommandLineArgumentException e) {
-                throw new InternalUnsupportedBuildArgumentException(
-                    "Problem with provided build arguments: " + arguments + ". "
-                        + "\n" + e.getMessage()
-                        + "\nEither it is not a valid build option or it is not supported in the target Gradle version."
-                        + "\nNot all of the Gradle command line options are supported build arguments."
-                        + "\nExamples of supported build arguments: '--info', '-p'."
-                        + "\nExamples of unsupported build options: '--daemon', '-?', '-v'."
-                        + "\nPlease find more information in the javadoc for the BuildLauncher class.", e);
-            }
-            converter.convert(parsedCommandLine, buildLayout, properties, startParameter);
+        StartParameterConverter converter = new StartParameterConverter();
+        CommandLineParser parser = new CommandLineParser();
+        new BuildLayoutConverter().configure(parser);
+        converter.configure(parser);
+        ParsedCommandLine parsedCommandLine;
+        try {
+            parsedCommandLine = parser.parse(arguments != null ? arguments : Collections.emptyList());
+        } catch (CommandLineArgumentException e) {
+            throw new InternalUnsupportedBuildArgumentException(
+                "Problem with provided build arguments: " + arguments + ". "
+                    + "\n" + e.getMessage()
+                    + "\nEither it is not a valid build option or it is not supported in the target Gradle version."
+                    + "\nNot all of the Gradle command line options are supported build arguments."
+                    + "\nExamples of supported build arguments: '--info', '-p'."
+                    + "\nExamples of unsupported build options: '--daemon', '-?', '-v'."
+                    + "\nPlease find more information in the javadoc for the BuildLauncher class.", e);
         }
+        converter.convert(parsedCommandLine, buildLayout, properties, startParameter);
 
         Boolean searchUpwards = parameters.isSearchUpwards();
         if (searchUpwards != null) {
