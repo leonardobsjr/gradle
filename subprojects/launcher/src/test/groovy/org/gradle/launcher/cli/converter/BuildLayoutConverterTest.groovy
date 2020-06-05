@@ -93,15 +93,19 @@ class BuildLayoutConverterTest extends Specification {
         parameters3.gradleUserHomeDir == dir3
     }
 
-    def "caller can override layout properties"() {
+    def "caller can provide default layout properties"() {
         when:
         def dir = new File("dir").absoluteFile
-        def parameters = convert(["--gradle-user-home", "ignore-me"]) {
-            gradleUserHomeDir = dir
+        def parameters = convert(["--gradle-user-home", "dir"]) {
+            gradleUserHomeDir = new File("ignore-me")
+            projectDir = dir
+            searchUpwards = true
         }
 
         then:
         parameters.gradleUserHomeDir == dir
+        parameters.projectDir == dir
+        parameters.searchUpwards
     }
 
     BuildLayoutParameters convert(List<String> args, @DelegatesTo(BuildLayoutParameters) Closure overrides = {}) {

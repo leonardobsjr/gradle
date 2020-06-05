@@ -49,12 +49,12 @@ public class BuildLayoutConverter {
         });
     }
 
-    public Result convert(ParsedCommandLine commandLine, Consumer<BuildLayoutParameters> overrides) {
+    public Result convert(ParsedCommandLine commandLine, Consumer<BuildLayoutParameters> defaults) {
         BuildLayoutParameters layoutParameters = new BuildLayoutParameters();
+        defaults.accept(layoutParameters);
         Map<String, String> requestedSystemProperties = systemPropertiesCommandLineConverter.convert(commandLine, new HashMap<>());
         new BuildLayoutParametersBuildOptions().propertiesConverter().convert(requestedSystemProperties, layoutParameters);
         buildLayoutConverter.convert(commandLine, layoutParameters);
-        overrides.accept(layoutParameters);
         return new Result(layoutParameters, Collections.unmodifiableMap(requestedSystemProperties));
     }
 
