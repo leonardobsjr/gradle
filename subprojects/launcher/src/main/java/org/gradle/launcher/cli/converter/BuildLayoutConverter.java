@@ -16,6 +16,7 @@
 
 package org.gradle.launcher.cli.converter;
 
+import org.gradle.api.internal.StartParameterInternal;
 import org.gradle.cli.CommandLineConverter;
 import org.gradle.cli.CommandLineParser;
 import org.gradle.cli.ParsedCommandLine;
@@ -79,6 +80,13 @@ public class BuildLayoutConverter {
             buildLayout.setSearchUpwards(this.buildLayout.getSearchUpwards());
             buildLayout.setGradleUserHomeDir(this.buildLayout.getGradleUserHomeDir());
             buildLayout.setGradleInstallationHomeDir(this.buildLayout.getGradleInstallationHomeDir());
+        }
+
+        public void applyTo(StartParameterInternal startParameter) {
+            startParameter.setProjectDir(buildLayout.getProjectDir());
+            startParameter.setCurrentDir(buildLayout.getCurrentDir());
+            startParameter.setSearchUpwardsWithoutDeprecationWarning(buildLayout.getSearchUpwards());
+            startParameter.setGradleUserHomeDir(buildLayout.getGradleUserHomeDir());
         }
 
         public File getGradleUserHomeDir() {
