@@ -267,6 +267,7 @@ public class ProviderConnection {
     private Parameters initParams(ProviderOperationParameters operationParameters) {
         CommandLineParser commandLineParser = new CommandLineParser();
         commandLineParser.allowUnknownOptions();
+        commandLineParser.allowMixedSubcommandsAndOptions();
 
         BuildLayoutConverter buildLayoutConverter = new BuildLayoutConverter();
         buildLayoutConverter.configure(commandLineParser);
@@ -281,6 +282,7 @@ public class ProviderConnection {
             if (searchUpwards != null) {
                 layout.setSearchUpwards(searchUpwards);
             }
+            layout.setCurrentDir(operationParameters.getProjectDir());
             layout.setProjectDir(operationParameters.getProjectDir());
         });
 
