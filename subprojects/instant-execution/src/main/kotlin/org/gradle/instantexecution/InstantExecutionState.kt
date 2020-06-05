@@ -23,6 +23,7 @@ import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.Provider
 import org.gradle.caching.configuration.BuildCache
 import org.gradle.execution.plan.Node
+import org.gradle.execution.plan.TaskNode
 import org.gradle.instantexecution.serialization.DefaultReadContext
 import org.gradle.instantexecution.serialization.DefaultWriteContext
 import org.gradle.instantexecution.serialization.IsolateOwner
@@ -196,7 +197,16 @@ class InstantExecutionState(
 
     private
     fun relevantProjectPathsFor(nodes: List<Node>): List<Project> =
-        nodes.mapNotNullTo(mutableListOf()) { node ->
+        nodes.flatMap { node ->
+            val collectedNodes = mutableSetOf(node)
+            collectedNodes += node.dependencySuccessors
+            if (node is TaskNode) {
+                collectedNodes += node.shouldSuccessors
+                collectedNodes += node.mustSuccessors
+                collectedNodes += node.finalizingSuccessors
+            }
+            collectedNodes
+        }.mapNotNullTo(mutableListOf()) { node ->
             node.owningProject
                 ?.takeIf { it.parent != null }
         }
