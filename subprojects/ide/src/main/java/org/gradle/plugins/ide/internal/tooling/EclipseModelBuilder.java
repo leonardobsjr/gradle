@@ -47,6 +47,7 @@ import org.gradle.plugins.ide.eclipse.model.Link;
 import org.gradle.plugins.ide.eclipse.model.Output;
 import org.gradle.plugins.ide.eclipse.model.ProjectDependency;
 import org.gradle.plugins.ide.eclipse.model.SourceFolder;
+import org.gradle.plugins.ide.eclipse.model.UnresolvedLibrary;
 import org.gradle.plugins.ide.internal.configurer.EclipseModelAwareUniqueProjectNameProvider;
 import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultAccessRule;
 import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultClasspathAttribute;
@@ -61,6 +62,7 @@ import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultEclipseProjectDepe
 import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultEclipseProjectNature;
 import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultEclipseSourceDirectory;
 import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultEclipseTask;
+import org.gradle.plugins.ide.internal.tooling.eclipse.DefaultUnresolvedEclipseExternalDependency;
 import org.gradle.plugins.ide.internal.tooling.java.DefaultInstalledJdk;
 import org.gradle.plugins.ide.internal.tooling.model.DefaultGradleProject;
 import org.gradle.tooling.model.UnsupportedMethodException;
@@ -260,7 +262,14 @@ public class EclipseModelBuilder implements ParameterizedToolingModelBuilder<Ecl
                 final File file = library.getLibrary().getFile();
                 final File source = library.getSourcePath() == null ? null : library.getSourcePath().getFile();
                 final File javadoc = library.getJavadocPath() == null ? null : library.getJavadocPath().getFile();
-                DefaultEclipseExternalDependency dependency = new DefaultEclipseExternalDependency(file, javadoc, source, library.getModuleVersion(), library.isExported(), createAttributes(library), createAccessRules(library));
+                DefaultEclipseExternalDependency dependency = null;
+                if(entry instanceof UnresolvedLibrary){
+                    dependency = new DefaultUnresolvedEclipseExternalDependency(file, javadoc, source, library.getModuleVersion(), library.isExported(), createAttributes(library), createAccessRules(library));
+                }
+                else{
+                    dependency = new DefaultEclipseExternalDependency(file, javadoc, source, library.getModuleVersion(), library.isExported(), createAttributes(library), createAccessRules(library));
+                }
+
                 classpathElements.getExternalDependencies().add(dependency);
             } else if (entry instanceof ProjectDependency) {
                 final ProjectDependency projectDependency = (ProjectDependency) entry;
